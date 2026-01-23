@@ -26,6 +26,8 @@ import javax.swing.JComponent;
 import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
 
+import com.ameliaWx.mpingApi.ReportType;
+import com.ameliaWx.mpingApi.mPINGReport;
 import com.ameliaWx.utils.general.PointF;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
@@ -93,8 +95,8 @@ public class RadarPanel extends JComponent {
 			
 			File countyBordersPoly = loadResourceAsFile("res/usCounties.poly");
 			File stateBordersPoly = loadResourceAsFile("res/usStates.poly");
-			File interstatesPoly = loadResourceAsFile("res/usInterstates.poly");
-			File majorRoadsPoly = loadResourceAsFile("res/usMajorRoads.poly");
+			File interstatesPoly = loadResourceAsFile("res/primary-roads.poly");
+			File majorRoadsPoly = loadResourceAsFile("res/prisec-roads.poly");
 			File estadosPoly = loadResourceAsFile("res/mxEstados.poly");
 			File canadianProvincesPoly = loadResourceAsFile("res/caProvinces.poly");
 			File canadianProvincesSubdPoly = loadResourceAsFile("res/caAdminSubd.poly");
@@ -103,8 +105,8 @@ public class RadarPanel extends JComponent {
 			
 			File countyBordersPolyMeta = loadResourceAsFile("res/usCounties.poly.meta");
 			File stateBordersPolyMeta = loadResourceAsFile("res/usStates.poly.meta");
-			File interstatesPolyMeta = loadResourceAsFile("res/usInterstates.poly.meta");
-			File majorRoadsPolyMeta = loadResourceAsFile("res/usMajorRoads.poly.meta");
+			File interstatesPolyMeta = loadResourceAsFile("res/primary-roads.poly.meta");
+			File majorRoadsPolyMeta = loadResourceAsFile("res/prisec-roads.poly.meta");
 			File estadosPolyMeta = loadResourceAsFile("res/mxEstados.poly.meta");
 			File canadianProvincesPolyMeta = loadResourceAsFile("res/caProvinces.poly.meta");
 			File canadianProvincesSubdPolyMeta = loadResourceAsFile("res/caAdminSubd.poly.meta");
@@ -131,6 +133,7 @@ public class RadarPanel extends JComponent {
 	public static BufferedImage watches; // check performance of watches draw
 	public static BufferedImage spcOutlook; // check performance of spc outlook draw
 	public static BufferedImage spcReports;
+	public static BufferedImage mpingReports;
 
 	public static BufferedImage buttonImg;
 
@@ -201,6 +204,7 @@ public class RadarPanel extends JComponent {
 			drawSpcStormReports(ulLon, ulLat, lrLon, lrLat, ppd, RadarView.spcStormReportPoints,
 					RadarView.spcStormReportTypes);
 			drawSiteButtons(ulLon, ulLat, lrLon, lrLat, ppd, RadarView.radarSites);
+			drawMpingReports(ulLon, ulLat, lrLon, lrLat, ppd, RadarView.mpingReports);
 
 			wwaUlLon = ulLon;
 			wwaLrLon = lrLon;
@@ -1340,6 +1344,72 @@ public class RadarPanel extends JComponent {
 		}
 
 		spcReports = reportsImg;
+	}
+
+	private void drawMpingReports(double ulLon, double ulLat, double lrLon, double lrLat, double ppd,
+			ArrayList<mPINGReport> reports) {
+		int imgWidth = (int) ((lrLon - ulLon) * ppd);
+		int imgHeight = (int) ((ulLat - lrLat) * ppd);
+
+		BufferedImage reportsImg = new BufferedImage(imgWidth, imgHeight, BufferedImage.TYPE_4BYTE_ABGR);
+		Graphics2D g = reportsImg.createGraphics();
+
+		if (RadarView.viewMpingReports) {
+			for (int i = 0; i < reports.size(); i++) {
+				PointF p1 = new PointF(reports.get(i).lat, reports.get(i).lon);
+
+				boolean renderP1 = (p1.getX() >= lrLat && p1.getX() <= ulLat && p1.getY() >= ulLon
+						&& p1.getY() <= lrLon);
+				if (renderP1) {
+					int x1 = (int) linScale(ulLon, lrLon, 0, imgWidth, p1.getY());
+					int y1 = (int) linScale(ulLat, lrLat, 0, imgHeight, p1.getX());
+					
+					ReportType type = reports.get(i).type;
+					
+					g.setColor(Color.BLACK);
+					g.fillOval(x1 - 6, y1 - 6, 12, 12);
+					
+					switch(type) {
+					case RAIN:
+						g.setColor(new Color(0, 196, 0));
+						break;
+					case DRIZZLE:
+						g.setColor(new Color(196, 255, 196));
+						break;
+					case FREEZING_DRIZZLE:
+						g.setColor(new Color(255, 196, 196));
+						break;
+					case FREEZING_RAIN:
+						g.setColor(new Color(196, 0, 0));
+						break;
+					case IP_SN_MIX:
+						g.setColor(new Color(196, 100, 0));
+						break;
+					case RN_IP_MIX:
+						g.setColor(new Color(203, 173, 153));
+						break;
+					case RN_SN_MIX:
+						g.setColor(new Color(153, 173, 203));
+						break;
+					case SLEET:
+						g.setColor(new Color(180, 78, 230));
+						break;
+					case SNOW:
+						g.setColor(new Color(0, 150, 255));
+						break;
+					case ZR_IP_MIX:
+						g.setColor(new Color(255, 75, 255));
+						break;
+					default:
+						break;
+					}
+					
+					g.fillOval(x1 - 4, y1 - 4, 8, 8);
+				}
+			}
+		}
+
+		mpingReports = reportsImg;
 	}
 
 	private static final BasicStroke BS = new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);

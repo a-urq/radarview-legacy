@@ -1,0 +1,49 @@
+;
+; Full range reflectivity palette
+; Made by Amelia Urquhart
+;
+
+Product: BR
+Units:  dBZ
+Step:   10
+
+Color4: -10      0    0    0    0  RAIN
+color4:  10     60   100  80   96  RAIN
+color:   20     49   171  141  RAIN
+color:   25    112  238  160  RAIN
+color:   30      6  105   10  RAIN
+Color:   34     10   80    0  RAIN
+Color:   40    255  225    0  255   128    0  RAIN
+Color:   50    255    0    0  RAIN
+color:   60     64    0    0  RAIN
+
+Color4: -10      0    0    0    0  FRZR
+Color4:  -5    255  129  192    0  FRZR
+Color4:  15    255  129  192   96  FRZR
+Color:   25    255  129  255  FRZR
+Color:   30    148   62  148   64   16  64  FRZR
+Color:   40    255  192  192  FRZR
+Color:   50    255    0    0  FRZR
+Color:   60     64    0   16  FRZR
+
+Color4: -10      0    0    0    0  ICEP
+Color4:  -5    192  128  255    0  ICEP
+Color4:  15    192  128  255   96  ICEP
+Color:   25    192  128  255  ICEP
+Color:   30    130   32  180   48   16   64  ICEP
+Color:   40    215  215  245  ICEP
+Color:   60     32   32   48  ICEP
+
+Color4: -10      0    0    0    0  SNOW
+Color4:  -5    110  232  255    0  SNOW
+Color4:  15    110  232  255   96  SNOW
+Color:   25    110  232  255  SNOW
+Color:   30      0  127  255    0    0   64  SNOW
+Color:   40    255  225  255  SNOW
+Color:   45    255   64  255  SNOW
+Color:   50    155   64  155  SNOW
+Color:   60     90   30   90  SNOW
+
+
+ND:   0   0   0
+RF: 128   0 192

@@ -76,11 +76,11 @@ public class RapInterpModel {
 	}
 
 	public int getPrecipitationType(DateTime time, double latitude, double longitude) {
-		return getPrecipitationType(time, latitude, longitude, PtypeAlgorithm.BOURGOUIN_REVISED_EXTENDED, true, -1024.0);
+		return getPrecipitationType(time, latitude, longitude, PtypeAlgorithm.RAMER, true, -1024.0);
 	}
 
 	public int getPrecipitationType(DateTime time, double latitude, double longitude, double srtmElev) {
-		return getPrecipitationType(time, latitude, longitude, PtypeAlgorithm.BOURGOUIN_REVISED_EXTENDED, true, srtmElev);
+		return getPrecipitationType(time, latitude, longitude, PtypeAlgorithm.RAMER, true, srtmElev);
 	}
 
 	private static final double SCALE_HEIGHT = 7290;
@@ -192,6 +192,10 @@ public class RapInterpModel {
 //					ptype = ptypeBourg;
 //				}
 				
+				break;
+			case RAMER:
+				ptype = PtypeAlgorithms.ramerExtendedMethod(pressureLevels, tmpIsobaric, dptIsobaric,
+						hgtIsobaric, presSurface, hgtSurface, tmpSurface);
 				break;
 			case URQUHART_EXPERIMENTAL:
 				break;

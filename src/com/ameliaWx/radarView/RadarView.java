@@ -53,6 +53,8 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import com.ameliaWx.mpingApi.mPINGReport;
+import com.ameliaWx.mpingApi.mPINGWrapper;
 import com.ameliaWx.radarView.mapProjections.LambertConformalProjection;
 import com.ameliaWx.radarView.nwpModel.NwpField;
 import com.ameliaWx.radarView.nwpModel.PtypeAlgorithm;
@@ -169,6 +171,8 @@ public class RadarView extends JFrame {
 	public static boolean inspectToolActive = false;
 
 	public static boolean viewCities = true;
+	
+	public static boolean viewLightning = false;
 
 	public static boolean isWindows = false;
 	
@@ -295,6 +299,9 @@ public class RadarView extends JFrame {
 			getSpcSevereWatches();
 			getSpcDay1Outlook();
 			getSpcStormReports();
+			getMpingReports();
+			
+			getLightning();
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -310,13 +317,13 @@ public class RadarView extends JFrame {
 		segmentStartTime = System.currentTimeMillis();
 
 //		reflectivityColors = new ColorTable(RadarPanel.loadResourceAsFile("res/colortables/awips/refl-awips-neon-2015.pal"), 0.1f, 10, "dBZ");
-		reflectivityColors = new ColorTable(RadarPanel.loadResourceAsFile("res/colortables/aru/aruRefl.pal"), 0.1f, 10, "dBZ");
-		reflectivityColorsLowFilter = new ColorTable(RadarPanel.loadResourceAsFile("res/colortables/aru/aruReflLowFilter.pal"), 0.1f,
+		reflectivityColors = new ColorTable(RadarPanel.loadResourceAsFile("res/colortables/awips/awips-ii-official-mod.pal"), 0.1f, 10, "dBZ");
+		reflectivityColorsLowFilter = new ColorTable(RadarPanel.loadResourceAsFile("res/colortables/awips/awips-ii-official-mod-low-filter-2.pal"), 0.1f,
 				10, "dBZ");
-		refl03PTypesColors = new ColorTable(RadarPanel.loadResourceAsFile("res/colortables/aru/aruRefl-3Ptypes.pal"), 0.1f, 10, "dBZ");
-		refl04PTypesColors = new ColorTable(RadarPanel.loadResourceAsFile("res/colortables/aru/aruRefl-4Ptypes.pal"), 0.1f, 10, "dBZ");
-		refl12PTypesColors = new ColorTable(RadarPanel.loadResourceAsFile("res/colortables/aru/aruRefl-12Ptypes.pal"), 0.1f, 10, "dBZ");
-		velocityColors = new ColorTable(RadarPanel.loadResourceAsFile("res/colortables/aru/aruVlcy.pal"), 0.1f, 20, "mph");
+		refl03PTypesColors = new ColorTable(RadarPanel.loadResourceAsFile("res/colortables/aru/aruRefl-3Ptypes3.pal"), 0.1f, 10, "dBZ");
+		refl04PTypesColors = new ColorTable(RadarPanel.loadResourceAsFile("res/colortables/aru/aruRefl-4Ptypes3.pal"), 0.1f, 10, "dBZ");
+		refl12PTypesColors = new ColorTable(RadarPanel.loadResourceAsFile("res/colortables/aru/aruRefl-12Ptypes2.pal"), 0.1f, 10, "dBZ");
+		velocityColors = new ColorTable(RadarPanel.loadResourceAsFile("res/colortables/srradarloops/SRRadarLoopsVlcy.pal"), 0.1f, 20, "mph");
 		specWdthColors = new ColorTable(RadarPanel.loadResourceAsFile("res/colortables/aru/aruSpwd.pal"), 0.1f, 10, "mph");
 		diffReflColors = new ColorTable(RadarPanel.loadResourceAsFile("res/colortables/aru/aruDrfl.pal"), 0.01f, 1, "dBZ");
 		corrCoefColors = new ColorTable(RadarPanel.loadResourceAsFile("res/colortables/aru/aruCrcf.pal"), 0.001f, 0.1f, "");
@@ -627,6 +634,9 @@ public class RadarView extends JFrame {
 						getSpcSevereWatches();
 						getSpcDay1Outlook();
 						getSpcStormReports();
+						getMpingReports();
+						
+						getLightning();
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -1197,6 +1207,80 @@ public class RadarView extends JFrame {
 					}
 				}
 			}
+			
+			g2d.drawImage(RadarPanel.mpingReports, wUlX, wUlY, wLrX, wLrY, 0, 0, RadarPanel.spcOutlook.getWidth(),
+					RadarPanel.spcOutlook.getHeight(), null);
+
+			// draw lightning
+			if (viewLightning) {
+				for(PointF strike : lightning60min) {
+					double lon = strike.getY();
+					double lat = strike.getX();
+					
+					if (lon > ulLon && lon < lrLon && lat < ulLat && lat > lrLat) {
+						int strikeX = (int) linScale(ulLon, lrLon, 0, width - 200, lon);
+						int strikeY = (int) linScale(ulLat, lrLat, 0, height, lat);
+
+						((Graphics2D) g).setStroke(new BasicStroke(3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+						g.setColor(new Color(0, 0, 0));
+						g.drawLine(strikeX, strikeY - 4, strikeX - 2, strikeY);
+						g.drawLine(strikeX - 2, strikeY, strikeX + 2, strikeY);
+						g.drawLine(strikeX + 2, strikeY, strikeX, strikeY + 4);
+
+						((Graphics2D) g).setStroke(new BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+						g.setColor(new Color(255, 255, 64, 128));
+						g.drawLine(strikeX, strikeY - 4, strikeX - 2, strikeY);
+						g.drawLine(strikeX - 2, strikeY, strikeX + 2, strikeY);
+						g.drawLine(strikeX + 2, strikeY, strikeX, strikeY + 4);
+					}
+				}
+
+				for(PointF strike : lightning40min) {
+					double lon = strike.getY();
+					double lat = strike.getX();
+					
+					if (lon > ulLon && lon < lrLon && lat < ulLat && lat > lrLat) {
+						int strikeX = (int) linScale(ulLon, lrLon, 0, width - 200, lon);
+						int strikeY = (int) linScale(ulLat, lrLat, 0, height, lat);
+
+
+						((Graphics2D) g).setStroke(new BasicStroke(3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+						g.setColor(new Color(0, 0, 0));
+						g.drawLine(strikeX, strikeY - 4, strikeX - 2, strikeY);
+						g.drawLine(strikeX - 2, strikeY, strikeX + 2, strikeY);
+						g.drawLine(strikeX + 2, strikeY, strikeX, strikeY + 4);
+
+						((Graphics2D) g).setStroke(new BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+						g.setColor(new Color(255, 150, 64));
+						g.drawLine(strikeX, strikeY - 4, strikeX - 2, strikeY);
+						g.drawLine(strikeX - 2, strikeY, strikeX + 2, strikeY);
+						g.drawLine(strikeX + 2, strikeY, strikeX, strikeY + 4);
+					}
+				}
+
+				for(PointF strike : lightning20min) {
+					double lon = strike.getY();
+					double lat = strike.getX();
+					
+					if (lon > ulLon && lon < lrLon && lat < ulLat && lat > lrLat) {
+						int strikeX = (int) linScale(ulLon, lrLon, 0, width - 200, lon);
+						int strikeY = (int) linScale(ulLat, lrLat, 0, height, lat);
+
+
+						((Graphics2D) g).setStroke(new BasicStroke(3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+						g.setColor(new Color(0, 0, 0));
+						g.drawLine(strikeX, strikeY - 6, strikeX - 3, strikeY);
+						g.drawLine(strikeX - 3, strikeY, strikeX + 3, strikeY);
+						g.drawLine(strikeX + 3, strikeY, strikeX, strikeY + 6);
+
+						((Graphics2D) g).setStroke(new BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+						g.setColor(new Color(255, 64, 96));
+						g.drawLine(strikeX, strikeY - 6, strikeX - 3, strikeY);
+						g.drawLine(strikeX - 3, strikeY, strikeX + 3, strikeY);
+						g.drawLine(strikeX + 3, strikeY, strikeX, strikeY + 6);
+					}
+				}
+			}
 
 			// draw home location
 			if (homeLat != -1024.0 && homeLon != -1024.0) {
@@ -1319,7 +1403,7 @@ public class RadarView extends JFrame {
 //			System.out.printf("%4.1f", 100.0 * usedMemory / maxMemory);
 //			System.out.println("%");
 
-			instance.setTitle("RadarView Beta Version 6 (RAM Usage: " + String.format("%4.1f", 100.0 * usedMemory / maxMemory)
+			instance.setTitle("RadarView Beta Version 8 (RAM Usage: " + String.format("%4.1f", 100.0 * usedMemory / maxMemory)
 					+ "%, " + convToGigaMega(usedMemory).trim() + ")");
 //			long paintEndTime = System.currentTimeMillis();
 //			System.out.println("paint exec time: " + (paintEndTime - paintStartTime) + " ms");
@@ -1492,6 +1576,9 @@ public class RadarView extends JFrame {
 
 				RadarView.g.repaint();
 				break;
+			case KeyEvent.VK_K:
+				viewLightning = !viewLightning;
+				break;
 			case KeyEvent.VK_L:
 				lowFilterOn = !lowFilterOn;
 				if (lowFilterOn) {
@@ -1507,6 +1594,16 @@ public class RadarView extends JFrame {
 
 				g.repaint();
 
+				break;
+			case KeyEvent.VK_M:
+				if (e.isControlDown()) {
+					for (mPINGReport report : RadarView.mpingReports) {
+						System.out.println(report);
+					}
+				} else {
+					viewMpingReports = !viewMpingReports;
+					g.repaint();
+				}
 				break;
 			case KeyEvent.VK_P:
 				DateTime scanTime = radarData[chosenTimestep].getScanTime();
@@ -1928,8 +2025,10 @@ public class RadarView extends JFrame {
 		PointF dR = PointF.subtract(dR2, dR1);
 		double windOffsetAngle = Math.atan2(-dR.getY(), dR.getX());
 
+//		JFrame loadWindow = new JFrame("Initializing Sounding Viewer...");
 		SoundingFrame s = new SoundingFrame("RAP", sounding0Obj, soundingTime0, soundingMObj, soundingTimeM, sounding1Obj, soundingTime1,
 				lat, lon, windOffsetAngle, new RadarMapInset(), instance);
+//		loadWindow.dispose();
 		s.setVisible(true);
 	}
 
@@ -2485,6 +2584,7 @@ public class RadarView extends JFrame {
 	public static boolean viewStormScaleWarnings = true;
 	public static boolean viewSpcOutlook = false;
 	public static boolean viewSpcStormReports = false;
+	public static boolean viewMpingReports = false;
 
 	public static boolean viewLargeScaleWarningsPrev = false;
 	public static boolean viewStormScaleWarningsPrev = true;
@@ -2825,6 +2925,25 @@ public class RadarView extends JFrame {
 		spcOutlookPolygons = getPolygonsSpcOutlook(new File(dataFolder + "temp/day1otlk_cat.kml"));
 	}
 
+	public static ArrayList<PointF> lightning20min;
+	public static ArrayList<PointF> lightning40min;
+	public static ArrayList<PointF> lightning60min;	
+	private static void getLightning() throws IOException {
+		downloadFile("https://placefilenation.com/Placefiles/20lightning.php", "temp/lightning20min.plc");
+		downloadFile("https://placefilenation.com/Placefiles/40lightning.php", "temp/lightning40min.plc");
+		downloadFile("https://placefilenation.com/Placefiles/60lightning.php", "temp/lightning60min.plc");
+		
+		lightning20min = getLightning(new File(dataFolder + "temp/lightning20min.plc"));
+		lightning40min = getLightning(new File(dataFolder + "temp/lightning40min.plc"));
+		lightning60min = getLightning(new File(dataFolder + "temp/lightning60min.plc"));
+	}
+
+	public static ArrayList<mPINGReport> mpingReports;
+	private static void getMpingReports() {
+		System.out.println("Getting mPING Reports");
+		mpingReports = mPINGWrapper.getReports(1);
+	}
+
 	private static void getSpcStormReports() throws IOException {
 		downloadFile("https://www.spc.noaa.gov/climo/reports/today.kmz", "temp/spcStormReports.kmz");
 
@@ -3152,6 +3271,38 @@ public class RadarView extends JFrame {
 		return polygons;
 	}
 
+	private static ArrayList<PointF> getLightning(File plc) {
+		ArrayList<PointF> strikes = new ArrayList<>();
+		
+		try {
+			Scanner sc = new Scanner(plc);
+			
+			while(sc.hasNextLine()) {
+				String line = sc.nextLine();
+				
+				if(line.startsWith("Icon: ")) {
+					String iconData = line.substring(6);
+					
+					String[] iconDataTokens = iconData.split(",");
+					
+					double latitude = Double.valueOf(iconDataTokens[0]);
+					double longitude = Double.valueOf(iconDataTokens[1]);
+					
+					PointF strike = new PointF(latitude, longitude);
+					
+					strikes.add(strike);
+				}
+			}
+			
+			sc.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return strikes;
+	}
+
 	private static final String[] SPC_CATEGORIES = { "TSTM", "MRGL", "SLGT", "ENH", "MDT", "HIGH" };
 
 	public static ArrayList<ArrayList<PointF>> spcOutlookPolygons;
@@ -3334,14 +3485,19 @@ public class RadarView extends JFrame {
 //			System.out.println(convToGigaMega(usedMemory));
 //			System.out.printf("%4.1f", 100.0 * usedMemory / maxMemory);
 //			System.out.println("%");
-			loadingMessage = "Loading Radiosonde Sites...";
+//			loadingMessage = "Loading Radiosonde Sites...";
 
-			try {
-				RadiosondeWrapper.initialize();
-				radiosondeList = RadiosondeSite.fourLetterCodeList();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						RadiosondeWrapper.initialize();
+						radiosondeList = RadiosondeSite.fourLetterCodeList();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}).start();
 
 			loadingMessage = "Loading SRTM Data...";
 			g.repaint();

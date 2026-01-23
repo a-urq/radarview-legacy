@@ -1,0 +1,35 @@
+product: BV
+units: MPH
+step: 20
+scale: 2.237
+
+Color: -160 60 0 60    
+Color: -100 0 0 80    
+Color: -95 0 0 161    
+Color: -90 5 42 255    
+Color: -85 23 88 255    
+Color: -80 63 109 255    
+Color: -75 99 117 255    
+Color: -70 115 155 255    
+Color: -65 125 187 255    
+Color: -60 151 211 255    
+Color: -55 176 224 236    
+Color: -50 176 255 236    
+Color: -45 176 255 196    
+Color: -40 180 255 165    
+Color: -30 97 206 114    
+Color: -25 76 182 95    
+Color: -20 16 175 49    
+Color: -15 0 134 22    
+Color: -10 5 94 23    
+Color: -5 7 40 14    
+color: 0 110 110 110
+color: 10 33 0 0
+color: 50 255 55 26
+color: 58 254 154 39
+color: 70 255 255 0
+color: 120 164 89 68
+color: 160 0 0 0
+
+ND:   0   0   0
+RF: 128   0 192

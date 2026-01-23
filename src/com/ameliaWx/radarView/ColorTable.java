@@ -42,7 +42,7 @@ public class ColorTable {
 
 	// for testing
 	public static void main(String[] args) throws IOException {
-		ColorTable aruRefl = new ColorTable(loadResourceAsFile("res/colortables/awips/refl-awips-neon-2015.pal"), 0.1f, 10, "dBZ");
+		ColorTable aruRefl = new ColorTable(loadResourceAsFile("res/colortables/aru/aruRefl-3Ptypes2.pal"), 0.1f, 10, "dBZ");
 		
 		System.out.println("refl @ -40 dBZ: " + aruRefl.getColor(-40));
 		System.out.println("refl @ -1024 dBZ: " + aruRefl.getColor(-1024));
@@ -102,8 +102,6 @@ public class ColorTable {
 				lineSc.close();
 
 				String[] tokens = tokensStr.toString().split(" ");
-
-//				System.out.println(Arrays.toString(tokens));
 
 				tokensList.add(tokens);
 			}
@@ -178,8 +176,14 @@ public class ColorTable {
 			String[] tokens = tokensList.get(i);
 
 			int mask = 0;
-
+			
 			if (tokens.length % 3 == 0) {
+				String maskId = tokens[tokens.length - 1];
+				
+				mask = maskId(maskId);
+			}
+
+			if ((tokens.length - 3) % 4 == 0) {
 				String maskId = tokens[tokens.length - 1];
 
 				mask = maskId(maskId);
@@ -194,11 +198,13 @@ public class ColorTable {
 				colorKeyAmt[mask]++;
 			}
 			
-			if(mask == 0) System.out.println(colorKeyAmt[mask] + "\t" + tokens[0]);
+//			if(mask == 3) System.out.println(colorKeyAmt[mask] + "\t" + tokens[0]);
 		}
 
 		float[][] colorKeys = new float[NUM_MASKS][];
 		Color[][] colorValues = new Color[NUM_MASKS][];
+		
+		System.out.println(Arrays.toString(colorKeyAmt));
 
 		for (int i = 0; i < NUM_MASKS; i++) {
 			colorKeys[i] = new float[colorKeyAmt[i]];
@@ -213,7 +219,13 @@ public class ColorTable {
 
 				int selectedMask = 0;
 
-				if (tokens.length % 3 == 0) {
+				if ((tokens.length - 3) % 3 == 0) {
+					String maskId = tokens[tokens.length - 1];
+
+					selectedMask = maskId(maskId);
+				}
+
+				if ((tokens.length - 3) % 4 == 0) {
 					String maskId = tokens[tokens.length - 1];
 
 					selectedMask = maskId(maskId);
@@ -271,6 +283,7 @@ public class ColorTable {
 		}
 
 		System.out.println(Arrays.toString(colorKeysProcessed));
+		System.out.println(Arrays.deepToString(colorKeys));
 
 		vmin = colorKeys[0][0];
 		vmax = colorKeys[0][colorKeys[0].length - 1];
@@ -407,12 +420,23 @@ public class ColorTable {
 			int r1 = values[i].getRed();
 			int g1 = values[i].getGreen();
 			int b1 = values[i].getBlue();
+			int a1 = values[i].getAlpha();
 			int r2 = values[i + 1].getRed();
 			int g2 = values[i + 1].getGreen();
 			int b2 = values[i + 1].getBlue();
+			int a2 = values[i + 1].getAlpha();
 
+//			System.out.println("v:" + value);
+//			System.out.println("key1:\t" + keys[i]);
+//			System.out.println("key2:\t" + keys[i + 1]);
+//			System.out.println("color1:\t" + (int) (r1) + "\t" + (int) (g1) + "\t" + (int) (b1) + "\t" + (int) (a1));
+//			System.out.println("color2:\t" + (int) (r2) + "\t" + (int) (g2) + "\t" + (int) (b2) + "\t" + (int) (a2));
+//			System.out.println("w1:\t" + w1);
+//			System.out.println("w2:\t" + w2);
+//			System.out.println((int) (r1 * w1 + r2 * w2) + "\t" + (int) (g1 * w1 + g2 * w2) + "\t" + (int) (b1 * w1 + b2 * w2) + "\t" + (int) (a1 * w1 + a2 * w2));
+			
 //			Color c = new Color((int) Math.pow(Math.sqrt(r1) * w1 + Math.sqrt(r2) * w2, 2), (int) Math.pow(Math.sqrt(g1) * w1 + Math.sqrt(g2) * w2, 2), (int) Math.pow(Math.sqrt(b1) * w1 + Math.sqrt(b2) * w2, 2));
-			Color c = new Color((int) (r1 * w1 + r2 * w2), (int) (g1 * w1 + g2 * w2), (int) (b1 * w1 + b2 * w2));
+			Color c = new Color((int) (r1 * w1 + r2 * w2), (int) (g1 * w1 + g2 * w2), (int) (b1 * w1 + b2 * w2), (int) (a1 * w1 + a2 * w2));
 
 			return c;
 		}

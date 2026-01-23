@@ -16,7 +16,7 @@
     </head>
     <body>
         <h1>RadarView Help Page</h1>
-        <p class="version"><i>Beta Version 5 - Released September 13, 2023<br>Made by <a href="about.html">Amelia Urquhart</a></i></p>
+        <p class="version"><i>Beta Version 8 - Released January 23, 2026<br>Made by <a href="about.html">Amelia Urquhart</a></i></p>
         <a href="https://docs.google.com/forms/d/e/1FAIpQLScJ_znAk9eXMFkPeXFscD6WDZAvThl3yZHq1_kdk6m0l59I9A/viewform?usp=sf_link">Click here to report a bug</a>
         <br>
         <a href="https://docs.google.com/forms/d/e/1FAIpQLSdteKWtiyNbjerKJ60fR7MtbUqR4ig4x7Yw0VKbO6yetnwsRQ/viewform?usp=sf_link">Click here to request a feature</a>
@@ -26,6 +26,7 @@
 
         <h2>Acknowledgements</h2>
         <p><i>Special thanks to Rylan Lopez and Richie Cross for helping me test this program on MacOS, Morgan J. Fuld for helping me test on Windows, and William Thiesing for telling me that there are extra reflectivity scans in the NEXRAD data files. I'm still figuring out how to access that extra data as of writing.</i></p>
+		<p>Additional special thanks to the mPING team at NSSL for providing me with an API key.</p>
 
         <h2>City Data Attribution</h2>
         <p>The city data used in RadarView is a modified version of the data provided by <a href = "https://simplemaps.com/data/us-cities">Simplemaps</a> under the Creative Commons Attribution 4.0 license.</p>
@@ -37,6 +38,7 @@
             <li><a href="#controls">Controls</a></li>
             <li><a href="#accessibility">Accessibility</a></li>
             <li><a href="#products">Products and How to Use Them</a></li>
+            <li><a href="#mpingproduct">mPING Product Key</a></li>
             <li><a href="#bugs">Known Issues</a></li>
             <li><a href="#future">Future Features</a></li>
         </ul>
@@ -222,6 +224,10 @@
                 <td>Toggles the low-filter on reflectivity scans.</td>
             </tr>
             <tr>
+                <td>M</td>
+                <td>Toggles visibility of mPING reports.</td>
+            </tr>
+            <tr>
                 <td>R</td>
                 <td>Toggles visibility of <a href="https://www.spc.noaa.gov/climo/reports/today.html">SPC Storm Reports.</a></td>
             </tr>
@@ -258,6 +264,59 @@
                 <td>Turns animation mode on.</td>
             </tr>
         </table>
+        
+        <h2 id="mpingproduct">mPING Product Key</h2>
+        <table>
+            <tr>
+                <th>Color</th>
+                <th>Report Type</th>
+            </tr>
+            <tr>
+                <td>Green</td>
+                <td>Rain</td>
+            </tr>
+            <tr>
+                <td>Pale green</td>
+                <td>Drizzle</td>
+            </tr>
+            <tr>
+                <td>Red</td>
+                <td>Freezing Rain</td>
+            </tr>
+            <tr>
+                <td>Pale red</td>
+                <td>Freezing Drizzle</td>
+            </tr>
+            <tr>
+                <td>Pale red</td>
+                <td>Freezing Drizzle</td>
+            </tr>
+            <tr>
+                <td>Purple</td>
+                <td>Sleet</td>
+            </tr>
+            <tr>
+                <td>Blue</td>
+                <td>Snow</td>
+            </tr>
+            <tr>
+                <td>Gray</td>
+                <td>Mixed Rain and Snow</td>
+            </tr>
+            <tr>
+                <td>Pale orange</td>
+                <td>Mixed Rain and Sleet</td>
+            </tr>
+            <tr>
+                <td>Magenta</td>
+                <td>Mixed Freezing Rain and Sleet</td>
+            </tr>
+            <tr>
+                <td>Orange</td>
+                <td>Mixed Sleet and Snow</td>
+            </tr>
+        </table>
+        
         <h2 id="accessibility">Accessibility</h2>
         <p>The default color tables have been designed intentionally to be usable for both fully color-sighted users and most colorblind users. I've used the <a href="https://pilestone.com/pages/color-blindness-simulator-1#">Pilestone Color Blindness Simulator</a> to guide development of the color tables, and they should work for users with Deutanopia (the most common form of red-green colorblindness), Protanopia (a less common form of red-green colorblindness), and Tritanopia (blue-yellow colorblindness). I have not yet been able to make them usable for users with Monochromacy (black-and-white vision), but I hope to do that at some point in the future.</p>
         <p>Though I've my best on the others, I have not checked the default color table for the 12-ptype precipitation depiction</p>
@@ -337,7 +396,6 @@
         <h2 id="future">Future Features</h2>
         <ul>
             <li>Historical data display</li>
-            <li>mPING report display</li>
             <li>Multiple-panel display modes</li>
             <li>Custom color tables, possibly a GUI tool to assist non-programmers in making their own color tables</li>
             <li>Better accessibility features, specifics to be figured out later</li>
